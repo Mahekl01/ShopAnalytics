@@ -56,28 +56,31 @@ function LoginPage() {
     };
 
     return (
-        <div className="login-container">
+        <div className="login-container" id="login-page">
             <div className="login-card">
                 <div className="login-header">
-                    <div className="login-logo">🛒</div>
-                    <h1 className="login-title">ShopAnalytics</h1>
-                    <p className="login-subtitle">Enter your credentials to access the dashboard</p>
+                    <div className="brand" style={{ justifyContent: "center", marginBottom: 16 }}>
+                        <span className="brand-icon" style={{ fontSize: 32 }}>🛒</span>
+                        <span className="brand-name" style={{ fontSize: 26 }}>ShopAnalytics</span>
+                    </div>
+                    <h1 className="login-title">Admin Terminal</h1>
+                    <p className="login-subtitle">Sign in to manage your shop's performance</p>
                 </div>
 
                 <form className="login-form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>Email Address</label>
+                        <label className="form-label">Email Address</label>
                         <input
                             type="email"
                             className="form-input"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
-                            placeholder="admin@shop.com"
+                            placeholder="mail@example.com"
                             required
                         />
                     </div>
-                    <div className="form-group">
-                        <label>Password</label>
+                    <div className="form-group" style={{ marginBottom: 32 }}>
+                        <label className="form-label">Password</label>
                         <input
                             type="password"
                             className="form-input"
@@ -88,15 +91,15 @@ function LoginPage() {
                         />
                     </div>
 
-                    {error && <div className="login-error">❌ {error}</div>}
+                    {error && <div style={{ color: "#ef4444", fontSize: 13, marginBottom: 20, background: "rgba(239,68,68,0.1)", padding: "12px", borderRadius: "10px", textAlign: "left" }}>❌ {error}</div>}
 
-                    <button type="submit" className="btn btn-primary login-btn" disabled={loading}>
-                        {loading ? <div className="login-loading-dot" /> : "Sign In"}
+                    <button type="submit" className="btn btn-primary btn-login" disabled={loading}>
+                        {loading ? "Authenticating..." : "Sign In to Dashboard"}
                     </button>
                 </form>
 
-                <div className="login-footer">
-                    &copy; 2026 ShopAnalytics Admin Terminal. All rights reserved.
+                <div style={{ marginTop: 24, fontSize: 12, color: "var(--text-muted)", opacity: 0.6 }}>
+                    &copy; 2026 ShopAnalytics Terminal. All rights reserved.
                 </div>
             </div>
         </div>
@@ -136,9 +139,7 @@ function Navbar({ onOpenDate, onToggleProfile, showProfile }) {
             </div>
 
             <div className="navbar-right">
-                <button className="date-trigger" onClick={onOpenDate}>
-                    📅 {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </button>
+
 
                 <button
                     className="theme-toggle"
@@ -162,8 +163,8 @@ function Navbar({ onOpenDate, onToggleProfile, showProfile }) {
                                 <div className="dropdown-user-name">{user?.name || "Shop Admin"}</div>
                                 <div className="dropdown-user-email">{user?.email || "admin@shop.com"}</div>
                             </div>
-                            <button className="menu-item">⚙️ Settings</button>
-                            <button className="menu-item">👤 Account</button>
+                            <button className="menu-item" onClick={() => { dispatch(actions.setActivePage("settings")); onToggleProfile(); }}>⚙️ Settings</button>
+                            <button className="menu-item" onClick={() => { dispatch(actions.setActivePage("account")); onToggleProfile(); }}>👤 Account</button>
                             <button className="menu-item logout" onClick={() => dispatch(actions.logout())}>🚪 Sign Out</button>
                         </div>
                     )}
@@ -177,11 +178,11 @@ function Navbar({ onOpenDate, onToggleProfile, showProfile }) {
 // SIDEBAR
 // ─────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
-    { id: "dashboard", icon: "📊", label: "Dashboard" },
-    { id: "orders", icon: "📦", label: "Orders" },
-    { id: "revenue", icon: "💰", label: "Revenue" },
-    { id: "products", icon: "🏆", label: "Top Products" },
-    { id: "categories", icon: "🗂️", label: "Categories" },
+    { id: "dashboard", label: "Dashboard" },
+    { id: "orders", label: "Orders" },
+    { id: "revenue", label: "Revenue" },
+    { id: "products", label: "Top Products" },
+    { id: "categories", label: "Categories" },
 ];
 
 function Sidebar() {
@@ -226,18 +227,17 @@ function Sidebar() {
 // ─────────────────────────────────────────────────────────────
 // STAT CARD
 // ─────────────────────────────────────────────────────────────
-function StatCard({ icon, label, value, sub, trend, color, id }) {
+function StatCard({ label, value, sub, trend, color, id }) {
     return (
         <div className={`stat-card stat-card--${color}`} id={id}>
-            <div className="stat-card-header">
-                <span className="stat-icon">{icon}</span>
-                <span className={`stat-trend ${trend >= 0 ? "up" : "down"}`}>
+            <div className="stat-card-header" style={{ marginBottom: 12 }}>
+                <span className="stat-label" style={{ fontSize: 13, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>{label}</span>
+                <span className={`stat-trend ${trend >= 0 ? "up" : "down"}`} style={{ fontSize: 12, fontWeight: 700 }}>
                     {trend >= 0 ? "▲" : "▼"} {Math.abs(trend)}%
                 </span>
             </div>
-            <div className="stat-value">{value}</div>
-            <div className="stat-label">{label}</div>
-            {sub && <div className="stat-sub">{sub}</div>}
+            <div className="stat-value" style={{ fontSize: 28, fontWeight: 800, marginBottom: 4 }}>{value}</div>
+            {sub && <div className="stat-sub" style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 500 }}>{sub}</div>}
         </div>
     );
 }
@@ -269,10 +269,10 @@ function DashboardPage() {
 
             {/* Stat Cards */}
             <div className="stats-grid">
-                <StatCard id="card-orders" icon="📦" label="Total Orders" value={totalOrders} sub={`${delivered} delivered`} trend={12.4} color="purple" />
-                <StatCard id="card-revenue" icon="💰" label="Total Revenue" value={fmt(totalRevenue)} sub={`Avg ${fmt(avgOrder)}/order`} trend={8.7} color="green" />
-                <StatCard id="card-products" icon="🏆" label="Products Sold" value={totalQty} sub={`${products.length} SKUs`} trend={5.2} color="blue" />
-                <StatCard id="card-categs" icon="🗂️" label="Active Categories" value={activeCateg} sub="All performing" trend={0} color="orange" />
+                <StatCard id="card-orders" label="Total Orders" value={totalOrders} sub={`${delivered} Orders Delivered`} trend={12.4} color="purple" />
+                <StatCard id="card-revenue" label="Total Revenue" value={fmt(totalRevenue)} sub={`Avg ${fmt(avgOrder)} per order`} trend={8.7} color="green" />
+                <StatCard id="card-products" label="Products Sold" value={totalQty} sub={`${products.length} SKUs Available`} trend={5.2} color="blue" />
+                <StatCard id="card-categs" label="Active Categories" value={activeCateg} sub="Steady Growth" trend={0} color="orange" />
             </div>
 
             {/* Charts row */}
@@ -415,26 +415,34 @@ function OrdersPage() {
 
     return (
         <div className="page-content" id="orders-page">
-            {/* Filters */}
-            <div className="filters-bar" id="orders-filters">
-                <input
-                    id="orders-search"
-                    className="filter-input"
-                    type="text"
-                    placeholder="🔍 Search by name or ID…"
-                    value={search}
-                    onChange={e => { dispatch(actions.setSearch(e.target.value)); setPage(1); }}
-                />
-                <select
-                    id="status-filter"
-                    className="filter-select"
-                    value={statusFilter}
-                    onChange={e => { dispatch(actions.setStatusFilter(e.target.value)); setPage(1); }}
-                >
-                    <option>All</option>
-                    <option>Delivered</option>
-                    <option>Pending</option>
-                </select>
+            {/* Header Actions */}
+            <div className="table-header-actions" id="orders-filters">
+                <div className="search-input-wrap">
+                    <span className="search-icon">🔍</span>
+                    <input
+                        id="orders-search"
+                        type="text"
+                        placeholder="Search by customer name or Order ID..."
+                        value={search}
+                        onChange={e => { dispatch(actions.setSearch(e.target.value)); setPage(1); }}
+                    />
+                </div>
+                <div style={{ display: "flex", gap: 12 }}>
+                    <select
+                        id="status-filter"
+                        className="btn"
+                        style={{ border: "1px solid var(--border)", background: "var(--bg-3)", color: "var(--text)" }}
+                        value={statusFilter}
+                        onChange={e => { dispatch(actions.setStatusFilter(e.target.value)); setPage(1); }}
+                    >
+                        <option value="All">All Status</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                    <button className="btn" style={{ border: "1px solid var(--border)", background: "var(--bg-3)", color: "var(--text)" }} onClick={exportCSV}>
+                        📤 Export CSV
+                    </button>
+                </div>
             </div>
 
             {/* Table */}
@@ -509,28 +517,21 @@ function RevenuePage() {
 
     return (
         <div className="page-content" id="revenue-page">
-            <div className="view-toggle" id="revenue-view-toggle">
-                <button id="btn-monthly" className={`toggle-btn ${view === "monthly" ? "active" : ""}`} onClick={() => dispatch(actions.setView("monthly"))}>Monthly</button>
-                <button id="btn-weekly" className={`toggle-btn ${view === "weekly" ? "active" : ""}`} onClick={() => dispatch(actions.setView("weekly"))}>Weekly</button>
-            </div>
+
 
             {/* KPI chips */}
             <div className="kpi-row">
                 <div className="kpi-chip" id="kpi-total-rev">
-                    <span className="kpi-icon">💰</span>
-                    <div><div className="kpi-val">{fmt(totalRev)}</div><div className="kpi-lbl">Total Revenue</div></div>
+                    <div><div className="kpi-lbl">Total Revenue</div><div className="kpi-val">{fmt(totalRev)}</div></div>
                 </div>
                 <div className="kpi-chip" id="kpi-avg-order">
-                    <span className="kpi-icon">🧾</span>
-                    <div><div className="kpi-val">{fmt(avgOrder)}</div><div className="kpi-lbl">Avg Order Value</div></div>
+                    <div><div className="kpi-lbl">Avg Order Value</div><div className="kpi-val">{fmt(avgOrder)}</div></div>
                 </div>
                 <div className="kpi-chip" id="kpi-peak">
-                    <span className="kpi-icon">📈</span>
-                    <div><div className="kpi-val">{peakMonth ? fmt(peakMonth.revenue) : "—"}</div><div className="kpi-lbl">Peak Month ({peakMonth?.month})</div></div>
+                    <div><div className="kpi-lbl">Peak Month ({peakMonth?.month})</div><div className="kpi-val">{peakMonth ? fmt(peakMonth.revenue) : "—"}</div></div>
                 </div>
                 <div className="kpi-chip" id="kpi-orders-count">
-                    <span className="kpi-icon">📦</span>
-                    <div><div className="kpi-val">{orders.length}</div><div className="kpi-lbl">Total Orders</div></div>
+                    <div><div className="kpi-lbl">Total Orders</div><div className="kpi-val">{orders.length}</div></div>
                 </div>
             </div>
 
@@ -652,12 +653,7 @@ function ProductsPage() {
 
     return (
         <div className="page-content" id="products-page">
-            <div className="page-header">
-                <div>
-                    <h1 className="page-title">Top Selling Products</h1>
-                    <p className="page-subtitle">Best performers by revenue & quantity</p>
-                </div>
-            </div>
+
 
             <div className="charts-row">
                 {/* Leaderboard */}
@@ -737,8 +733,138 @@ function ProductsPage() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// CATEGORIES PAGE
+// SETTINGS PAGE
 // ─────────────────────────────────────────────────────────────
+function SettingsPage() {
+    const dispatch = useDispatch();
+    const darkMode = useSelector(s => s.ui.darkMode);
+
+    return (
+        <div className="page-content" id="settings-page">
+            <div className="settings-container" style={{ maxWidth: 800 }}>
+                <div className="chart-card" style={{ marginBottom: 24 }}>
+                    <div className="chart-card-header">
+                        <h2 className="chart-title">Appearance</h2>
+                    </div>
+                    <div className="settings-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0" }}>
+                        <div>
+                            <div style={{ fontWeight: 600 }}>Dark Mode</div>
+                            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>Use dark theme for the interface</div>
+                        </div>
+                        <button className={`btn ${darkMode ? "btn-primary" : ""}`} onClick={() => dispatch(actions.toggleDarkMode())}>
+                            {darkMode ? "Enabled" : "Disabled"}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="chart-card" style={{ marginBottom: 24 }}>
+                    <div className="chart-card-header">
+                        <h2 className="chart-title">Notifications</h2>
+                    </div>
+                    <div className="settings-list">
+                        {[
+                            { title: "Email Notifications", sub: "Receive daily sales summaries via email" },
+                            { title: "Order Alerts", sub: "Get real-time alerts for new orders" },
+                            { title: "Stock Warnings", sub: "Notify when products are low on stock" }
+                        ].map((s, i) => (
+                            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 0", borderBottom: i < 2 ? "1px solid var(--border)" : "none" }}>
+                                <div>
+                                    <div style={{ fontWeight: 600 }}>{s.title}</div>
+                                    <div style={{ fontSize: 13, color: "var(--text-muted)" }}>{s.sub}</div>
+                                </div>
+                                <input type="checkbox" defaultChecked style={{ width: 20, height: 20, cursor: "pointer" }} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="chart-card">
+                    <div className="chart-card-header">
+                        <h2 className="chart-title">Data Management</h2>
+                    </div>
+                    <div style={{ padding: "12px 0" }}>
+                        <p style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 16 }}>Clear local cache and refresh application data from the server.</p>
+                        <button className="btn" style={{ border: "1px solid var(--border)", background: "var(--bg-3)" }}>🧹 Clear Cache</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ─────────────────────────────────────────────────────────────
+// ACCOUNT PAGE
+// ─────────────────────────────────────────────────────────────
+function AccountPage() {
+    const dispatch = useDispatch();
+    const user = useSelector(s => s.auth.user) || { name: "Shop Admin", email: "admin@shop.com" };
+
+    const [editName, setEditName] = useState(user.name);
+    const [editEmail, setEditEmail] = useState(user.email);
+    const [editRole, setEditRole] = useState("Primary Administrator");
+    const [editTimeZone, setEditTimeZone] = useState("GMT +5:30 (IST)");
+    const [saveKey, setSaveKey] = useState(0);
+
+    const handleSave = () => {
+        // Dispatching a mock update to auth store if needed, or simply showing a success state
+        dispatch({ type: "auth/loginSuccess", payload: { name: editName, email: editEmail } });
+        setSaveKey(prev => prev + 1);
+        setTimeout(() => setSaveKey(0), 3000); // Show success message roughly for 3s
+    };
+
+    return (
+        <div className="page-content" id="account-page">
+            <div className="account-container" style={{ maxWidth: 800 }}>
+                <div className="chart-card" style={{ marginBottom: 24 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 24, padding: "24px 0" }}>
+                        <div style={{ 
+                            width: 100, height: 100, borderRadius: "50%", 
+                            background: "linear-gradient(135deg, var(--accent-1), var(--accent-2))",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 40, fontWeight: 800, color: "white"
+                        }}>
+                            {editName[0]}
+                        </div>
+                        <div>
+                            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>{editName}</h2>
+                            <div style={{ color: "var(--text-muted)", marginBottom: 12 }}>{editRole} · Since Jan 2024</div>
+                            <button className="btn btn-primary" style={{ fontSize: 12, padding: "6px 16px" }}>Change Photo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="chart-card">
+                    <div className="chart-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <h2 className="chart-title">Profile Information</h2>
+                        {saveKey > 0 && <span style={{ color: "var(--green)", fontSize: 13, fontWeight: 600 }}>✅ Changes Saved</span>}
+                    </div>
+                    <div className="form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 16 }}>
+                        <div className="form-group">
+                            <label className="form-label" style={{ display: "block", marginBottom: 8, fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Full Name</label>
+                            <input type="text" className="form-input" value={editName} onChange={e => setEditName(e.target.value)} style={{ width: "100%", padding: "12px", border: "1px solid var(--border)", borderRadius: 8, background: "transparent", color: "var(--text)", outline: "none" }} onFocus={e => e.target.style.borderColor = "var(--accent-1)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label" style={{ display: "block", marginBottom: 8, fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Email Address</label>
+                            <input type="email" className="form-input" value={editEmail} onChange={e => setEditEmail(e.target.value)} style={{ width: "100%", padding: "12px", border: "1px solid var(--border)", borderRadius: 8, background: "transparent", color: "var(--text)", outline: "none" }} onFocus={e => e.target.style.borderColor = "var(--accent-1)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label" style={{ display: "block", marginBottom: 8, fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Role</label>
+                            <input type="text" className="form-input" value={editRole} onChange={e => setEditRole(e.target.value)} style={{ width: "100%", padding: "12px", border: "1px solid var(--border)", borderRadius: 8, background: "transparent", color: "var(--text)", outline: "none" }} onFocus={e => e.target.style.borderColor = "var(--accent-1)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label" style={{ display: "block", marginBottom: 8, fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>TimeZone</label>
+                            <input type="text" className="form-input" value={editTimeZone} onChange={e => setEditTimeZone(e.target.value)} style={{ width: "100%", padding: "12px", border: "1px solid var(--border)", borderRadius: 8, background: "transparent", color: "var(--text)", outline: "none" }} onFocus={e => e.target.style.borderColor = "var(--accent-1)"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
+                        </div>
+                    </div>
+                    <div style={{ marginTop: 32, display: "flex", gap: 12 }}>
+                        <button className="btn btn-primary" onClick={handleSave}>Save Changes</button>
+                        <button className="btn" style={{ border: "1px solid var(--border)" }} onClick={() => { setEditName(user.name); setEditEmail(user.email); }}>Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 function CategoriesPage() {
     const catState = useSelector(s => s.categories);
     const { data: categories, loading } = catState;
@@ -761,22 +887,22 @@ function CategoriesPage() {
 
     return (
         <div className="page-content" id="categories-page">
-            <div className="charts-row">
+            <div className="charts-row" style={{ gridTemplateColumns: "1fr 1fr" }}>
                 {/* Donut chart */}
                 <div className="chart-card" id="category-donut-chart">
                     <div className="chart-card-header">
                         <h2 className="chart-title">Sales Distribution</h2>
                     </div>
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={280}>
                         <PieChart>
-                            <Pie data={categories} dataKey="sales" cx="50%" cy="50%" innerRadius={70} outerRadius={120}
+                            <Pie data={categories} dataKey="sales" cx="50%" cy="50%" innerRadius={70} outerRadius={110}
                                 paddingAngle={5} labelLine={false} label={renderCustomLabel}>
                                 {categories.map((c, i) => <Cell key={i} fill={c.color} />)}
                             </Pie>
                             <Tooltip formatter={v => fmt(v)} contentStyle={{ background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)" }} />
                         </PieChart>
                     </ResponsiveContainer>
-                    <div className="pie-legend">
+                    <div className="pie-legend" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                         {categories.map((c, i) => (
                             <div key={i} className="pie-legend-item">
                                 <span className="pie-dot" style={{ background: c.color }} />
@@ -787,53 +913,46 @@ function CategoriesPage() {
                     </div>
                 </div>
 
-                {/* Category cards */}
-                <div className="chart-card chart-card--wide" id="category-details">
+                {/* Category Performance Table */}
+                <div className="chart-card" id="category-details">
                     <div className="chart-card-header">
-                        <h2 className="chart-title">Category Performance</h2>
+                        <h2 className="chart-title">Performance Summary</h2>
                     </div>
-                    <div className="category-cards">
-                        {categories.map((c, i) => (
-                            <div key={i} className="cat-card" id={`cat-card-${c.name.toLowerCase()}`} style={{ "--cat-color": c.color }}>
-                                <div className="cat-card-header">
-                                    <div className="cat-color-dot" style={{ background: c.color }} />
-                                    <h3 className="cat-name">{c.name}</h3>
-                                </div>
-                                <div className="cat-stats">
-                                    <div className="cat-stat">
-                                        <div className="cat-stat-val">{fmt(c.sales)}</div>
-                                        <div className="cat-stat-lbl">Total Sales</div>
-                                    </div>
-                                    <div className="cat-stat">
-                                        <div className="cat-stat-val">{c.orders}</div>
-                                        <div className="cat-stat-lbl">Orders</div>
-                                    </div>
-                                    <div className="cat-stat">
-                                        <div className="cat-stat-val">{pct(c.sales, totalSales)}</div>
-                                        <div className="cat-stat-lbl">Market Share</div>
-                                    </div>
-                                    <div className="cat-stat">
-                                        <div className="cat-stat-val">{fmt(Math.round(c.sales / c.orders))}</div>
-                                        <div className="cat-stat-lbl">Avg Order</div>
-                                    </div>
-                                </div>
-                                <div className="cat-progress-wrap">
-                                    <div className="cat-progress-bar" style={{ width: pct(c.sales, totalSales), background: c.color }} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Bar chart for orders */}
-                    <div style={{ marginTop: 24 }}>
-                        <h3 className="chart-title" style={{ fontSize: 14, marginBottom: 12 }}>Orders by Category</h3>
-                        <ResponsiveContainer width="100%" height={180}>
-                            <BarChart data={categories} margin={{ top: 5, right: 15, left: -10, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="name" tick={{ fill: "var(--text-muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                                <YAxis tick={{ fill: "var(--text-muted)", fontSize: 11 }} axisLine={false} tickLine={false} />
-                                <Tooltip contentStyle={{ background: "var(--card-bg)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)" }} />
-                                <Bar dataKey="orders" name="Orders" radius={[6, 6, 0, 0]}>
+                    <table className="data-table" style={{ marginTop: 8 }}>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th style={{ textAlign: "right" }}>Sales</th>
+                                <th style={{ textAlign: "right" }}>Share</th>
+                                <th style={{ textAlign: "right" }}>Avg Order</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {categories.map((c, i) => (
+                                <tr key={i}>
+                                    <td>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <div style={{ width: 10, height: 10, borderRadius: "50%", background: c.color }} />
+                                            <strong>{c.name}</strong>
+                                        </div>
+                                    </td>
+                                    <td style={{ textAlign: "right" }}>{fmt(c.sales)}</td>
+                                    <td style={{ textAlign: "right" }}>{pct(c.sales, totalSales)}</td>
+                                    <td style={{ textAlign: "right" }}>{fmt(Math.round(c.sales / c.orders))}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    
+                    {/* Orders bar small */}
+                    <div style={{ marginTop: 32 }}>
+                        <h3 className="chart-title" style={{ fontSize: 13, marginBottom: 12 }}>Order Volume</h3>
+                        <ResponsiveContainer width="100%" height={120}>
+                            <BarChart data={categories} margin={{ top: 0, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis dataKey="name" tick={{ fill: "var(--text-muted)", fontSize: 11 }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fill: "var(--text-muted)", fontSize: 10 }} axisLine={false} tickLine={false} />
+                                <Bar dataKey="orders" radius={[4, 4, 0, 0]}>
                                     {categories.map((c, i) => <Cell key={i} fill={c.color} />)}
                                 </Bar>
                             </BarChart>
@@ -852,26 +971,62 @@ function DatePickerModal({ isOpen, onClose, currentRange, onSelect }) {
     if (!isOpen) return null;
 
     const ranges = ["Today", "Last 7 Days", "This Month", "Last 3 Months", "Year to Date", "All Time"];
+    const [isCustom, setIsCustom] = useState(false);
+    const [customStart, setCustomStart] = useState("");
+    const [customEnd, setCustomEnd] = useState("");
+
+    const handleCustom = (e) => {
+        e.preventDefault();
+        if (customStart && customEnd) {
+            onSelect(`${customStart} to ${customEnd}`);
+            onClose();
+        }
+    };
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-                <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Select Date Range</h2>
-                <p style={{ color: "var(--text-muted)", fontSize: 14 }}>Filtering dashboard data for the selected period.</p>
+            <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
+                <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>Filter by Date</h2>
+                <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 24 }}>Select a preset range or pick a custom period.</p>
                 
-                <div className="date-grid">
+                <div className="date-grid" style={{ marginBottom: 20 }}>
                     {ranges.map(r => (
                         <button 
                             key={r} 
-                            className={`date-pill ${currentRange === r ? "active" : ""}`}
-                            onClick={() => { onSelect(r); onClose(); }}
+                            className={`date-pill ${currentRange === r && !isCustom ? "active" : ""}`}
+                            onClick={() => { setIsCustom(false); onSelect(r); onClose(); }}
                         >
                             {r}
                         </button>
                     ))}
                 </div>
 
-                <button className="btn-primary" onClick={onClose} style={{ marginTop: 12 }}>Close</button>
+                <div style={{ padding: "20px 0", borderTop: "1px solid var(--border)" }}>
+                    <button 
+                        className={`btn ${isCustom ? "active-custom" : ""}`} 
+                        style={{ width: "100%", textAlign: "left", display: "flex", justifyContent: "space-between", marginBottom: isCustom ? 16 : 0, background: isCustom ? "var(--bg-3)" : "transparent", border: isCustom ? "1px solid var(--accent-1)" : "1px solid var(--border)" }}
+                        onClick={() => setIsCustom(!isCustom)}
+                    >
+                        <span>📅 Custom Range</span>
+                        <span>{isCustom ? "−" : "+"}</span>
+                    </button>
+
+                    {isCustom && (
+                        <form onSubmit={handleCustom} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                            <div className="form-group">
+                                <label className="form-label">Start Date</label>
+                                <input type="date" className="form-input" value={customStart} onChange={e => setCustomStart(e.target.value)} required />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">End Date</label>
+                                <input type="date" className="form-input" value={customEnd} onChange={e => setCustomEnd(e.target.value)} required />
+                            </div>
+                            <button type="submit" className="btn btn-primary" style={{ gridColumn: "span 2", marginTop: 8 }}>Apply Custom Range</button>
+                        </form>
+                    )}
+                </div>
+
+                <button className="btn" onClick={onClose} style={{ width: "100%", marginTop: 12, border: "1px solid var(--border)" }}>Cancel</button>
             </div>
         </div>
     );
@@ -917,6 +1072,8 @@ function App() {
         revenue: <RevenuePage />,
         products: <ProductsPage />,
         categories: <CategoriesPage />,
+        settings: <SettingsPage />,
+        account: <AccountPage />,
     };
 
     return (
@@ -932,10 +1089,35 @@ function App() {
                 <main className="main-content" id="main-content">
                     <div style={{ marginBottom: 28, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                         <div>
-                            <h1 className="page-title">{activePage.charAt(0).toUpperCase() + activePage.slice(1)}</h1>
+                            <h1 className="page-title">{activePage === "products" ? "Product Performance" : activePage.charAt(0).toUpperCase() + activePage.slice(1)}</h1>
                             <p className="page-subtitle">Showing data for <strong>{dateRange}</strong></p>
                         </div>
-                        <div className="page-date">📅 {new Date().toLocaleDateString("en-IN", { weekday: "long", month: "long", day: "numeric" })}</div>
+                        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                            {activePage === "revenue" && (
+                                <div className="view-toggle" id="revenue-view-toggle">
+                                    <button id="btn-monthly" className={`toggle-btn ${store.getState().revenue.view === "monthly" ? "active" : ""}`} onClick={() => dispatch(actions.setView("monthly"))}>Monthly</button>
+                                    <button id="btn-weekly" className={`toggle-btn ${store.getState().revenue.view === "weekly" ? "active" : ""}`} onClick={() => dispatch(actions.setView("weekly"))}>Weekly</button>
+                                </div>
+                            )}
+                            
+                            <div 
+                                className="date-box-trigger" 
+                                onClick={() => setShowDatePicker(true)}
+                                style={{ 
+                                    display: "flex", alignItems: "center", gap: 12, padding: "10px 18px", 
+                                    background: "var(--card-bg)", border: "1px solid var(--border)", 
+                                    borderRadius: "12px", cursor: "pointer", transition: "all 0.2s",
+                                    boxShadow: "var(--shadow)"
+                                }}
+                            >
+                                <span style={{ fontSize: 20 }}>📅</span>
+                                <div style={{ textAlign: "left" }}>
+                                    <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Reporting Period</div>
+                                    <div style={{ fontSize: 14, fontWeight: 600, color: "var(--accent-1)" }}>{dateRange}</div>
+                                </div>
+                                <span style={{ marginLeft: 8, opacity: 0.4 }}>▼</span>
+                            </div>
+                        </div>
                     </div>
                     {pages[activePage]}
                 </main>

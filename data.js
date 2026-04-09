@@ -1,9 +1,9 @@
 // ShopAnalytics – Static Data (simulates /api/orders, /api/products, /api/revenue, /api/categories)
 const SHOP_DATA = {
   orders: [
-    { id: "ORD-001", customer: "Radhika Sharma",   date: "2026-04-01", amount: 1200, status: "Delivered", category: "Electronics" },
+    { id: "ORD-001", customer: "Amit Kumar",       date: "2026-04-01", amount: 1200, status: "Delivered", category: "Electronics" },
     { id: "ORD-002", customer: "Arjun Mehta",      date: "2026-04-02", amount: 850,  status: "Pending",   category: "Clothing" },
-    { id: "ORD-003", customer: "Priya Nair",       date: "2026-04-02", amount: 3400, status: "Delivered", category: "Electronics" },
+    { id: "ORD-003", customer: "Sonia Verma",      date: "2026-04-02", amount: 3400, status: "Delivered", category: "Electronics" },
     { id: "ORD-004", customer: "Karan Kapoor",     date: "2026-04-03", amount: 560,  status: "Delivered", category: "Accessories" },
     { id: "ORD-005", customer: "Sneha Reddy",      date: "2026-04-03", amount: 1900, status: "Pending",   category: "Clothing" },
     { id: "ORD-006", customer: "Vikram Patel",     date: "2026-04-04", amount: 720,  status: "Delivered", category: "Accessories" },

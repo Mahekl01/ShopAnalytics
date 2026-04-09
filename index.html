@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ShopAnalytics – Sales Dashboard</title>
-  <meta name="description" content="ShopAnalytics admin dashboard – track orders, revenue, top products and category performance with real-time Redux state management." />
+  <meta name="description"
+    content="ShopAnalytics admin dashboard – track orders, revenue, top products and category performance with real-time Redux state management." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
+
 <body>
   <div id="root"></div>
 
@@ -33,31 +37,31 @@
     // ShopAnalytics – Minimal Redux Store (vanilla JS, no deps)
     // ============================================================
 
-    (function() {
+    (function () {
       function createSimpleStore(reducer, initialState) {
         var state = initialState;
         var listeners = [];
-        
+
         return {
-          getState: function() { return state; },
-          dispatch: function(action) {
+          getState: function () { return state; },
+          dispatch: function (action) {
             if (typeof action === 'function') {
               return action(
-                function(a) {
+                function (a) {
                   state = reducer(state, a);
-                  listeners.slice().forEach(function(l) { l(); });
+                  listeners.slice().forEach(function (l) { l(); });
                 },
-                function() { return state; }
+                function () { return state; }
               );
             }
             state = reducer(state, action);
-            listeners.slice().forEach(function(l) { l(); });
+            listeners.slice().forEach(function (l) { l(); });
             return action;
           },
-          subscribe: function(listener) {
+          subscribe: function (listener) {
             listeners.push(listener);
-            return function() {
-              listeners = listeners.filter(function(l) { return l !== listener; });
+            return function () {
+              listeners = listeners.filter(function (l) { return l !== listener; });
             };
           }
         };
@@ -126,10 +130,10 @@
       var store = createSimpleStore(rootReducer, initialState);
 
       var shopActions = {
-        login: function(email, password) {
-          return function(dispatch) {
+        login: function (email, password) {
+          return function (dispatch) {
             dispatch({ type: "auth/setLoading", payload: true });
-            setTimeout(function() {
+            setTimeout(function () {
               if (email === "admin@shop.com" && password === "admin123") {
                 dispatch({ type: "auth/loginSuccess", payload: { email: email, name: "Shop Admin" } });
               } else {
@@ -138,36 +142,36 @@
             }, 800);
           };
         },
-        logout: function() { return { type: "auth/logout" }; },
-        setSearch: function(v) { return { type: "orders/setSearch", payload: v }; },
-        setStatusFilter: function(v) { return { type: "orders/setStatusFilter", payload: v }; },
-        setSortBy: function(v) { return { type: "orders/setSortBy", payload: v }; },
-        setView: function(v) { return { type: "revenue/setView", payload: v }; },
-        setActivePage: function(v) { return { type: "ui/setActivePage", payload: v }; },
-        toggleDarkMode: function() { return { type: "ui/toggleDarkMode" }; },
-        toggleSidebar: function() { return { type: "ui/toggleSidebar" }; },
-        fetchOrders: function() {
-          return function(dispatch) {
+        logout: function () { return { type: "auth/logout" }; },
+        setSearch: function (v) { return { type: "orders/setSearch", payload: v }; },
+        setStatusFilter: function (v) { return { type: "orders/setStatusFilter", payload: v }; },
+        setSortBy: function (v) { return { type: "orders/setSortBy", payload: v }; },
+        setView: function (v) { return { type: "revenue/setView", payload: v }; },
+        setActivePage: function (v) { return { type: "ui/setActivePage", payload: v }; },
+        toggleDarkMode: function () { return { type: "ui/toggleDarkMode" }; },
+        toggleSidebar: function () { return { type: "ui/toggleSidebar" }; },
+        fetchOrders: function () {
+          return function (dispatch) {
             dispatch({ type: "orders/setLoading", payload: true });
-            setTimeout(function() { dispatch({ type: "orders/setData", payload: SHOP_DATA.orders }); }, 600);
+            setTimeout(function () { dispatch({ type: "orders/setData", payload: SHOP_DATA.orders }); }, 600);
           };
         },
-        fetchProducts: function() {
-          return function(dispatch) {
+        fetchProducts: function () {
+          return function (dispatch) {
             dispatch({ type: "products/setLoading", payload: true });
-            setTimeout(function() { dispatch({ type: "products/setData", payload: SHOP_DATA.products }); }, 700);
+            setTimeout(function () { dispatch({ type: "products/setData", payload: SHOP_DATA.products }); }, 700);
           };
         },
-        fetchRevenue: function() {
-          return function(dispatch) {
+        fetchRevenue: function () {
+          return function (dispatch) {
             dispatch({ type: "revenue/setLoading", payload: true });
-            setTimeout(function() { dispatch({ type: "revenue/setData", payload: { monthly: SHOP_DATA.monthlyRevenue, weekly: SHOP_DATA.weeklyRevenue } }); }, 500);
+            setTimeout(function () { dispatch({ type: "revenue/setData", payload: { monthly: SHOP_DATA.monthlyRevenue, weekly: SHOP_DATA.weeklyRevenue } }); }, 500);
           };
         },
-        fetchCategories: function() {
-          return function(dispatch) {
+        fetchCategories: function () {
+          return function (dispatch) {
             dispatch({ type: "categories/setLoading", payload: true });
-            setTimeout(function() { dispatch({ type: "categories/setData", payload: SHOP_DATA.categories }); }, 550);
+            setTimeout(function () { dispatch({ type: "categories/setData", payload: SHOP_DATA.categories }); }, 550);
           };
         }
       };
@@ -180,4 +184,5 @@
   <!-- App logic -->
   <script type="text/babel" src="app.jsx"></script>
 </body>
+
 </html>
