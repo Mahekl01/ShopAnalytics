@@ -28,8 +28,30 @@
   <!-- Babel (JSX in browser) -->
   <script src="vendor/babel.min.js"></script>
 
-  <!-- App data -->
-  <script src="data.js"></script>
+
+  <!-- Firebase Compat libraries -->
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+
+  <!-- Initialize Firebase -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDsZYNNaqfbMclOzXOBehThD9BhTS3NL7g",
+      authDomain: "quantam-market.firebaseapp.com",
+      databaseURL: "https://quantam-market-default-rtdb.firebaseio.com",
+      projectId: "quantam-market",
+      storageBucket: "quantam-market.firebasestorage.app",
+      messagingSenderId: "275250297765",
+      appId: "1:275250297765:web:906cb54432c8d41524464c",
+      measurementId: "G-0KGEYJ3PN2"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    window.googleProvider = new firebase.auth.GoogleAuthProvider();
+  </script>
 
   <!-- Store (inline to guarantee order) -->
   <script>
@@ -133,16 +155,53 @@
         login: function (email, password) {
           return function (dispatch) {
             dispatch({ type: "auth/setLoading", payload: true });
-            setTimeout(function () {
-              if (email === "admin@shop.com" && password === "admin123") {
-                dispatch({ type: "auth/loginSuccess", payload: { email: email, name: "Shop Admin" } });
-              } else {
-                dispatch({ type: "auth/loginFailure", payload: "Invalid credentials" });
-              }
-            }, 800);
+            dispatch({ type: "auth/loginFailure", payload: null });
+            window.auth.signInWithEmailAndPassword(email, password)
+              .then(function(userCredential) {
+                dispatch({ type: "auth/loginSuccess", payload: { email: userCredential.user.email, name: userCredential.user.displayName || "Admin" } });
+              })
+              .catch(function(error) {
+                dispatch({ type: "auth/loginFailure", payload: error.message });
+              });
           };
         },
-        logout: function () { return { type: "auth/logout" }; },
+        register: function(email, password) {
+          return function(dispatch) {
+            dispatch({ type: "auth/setLoading", payload: true });
+            dispatch({ type: "auth/loginFailure", payload: null });
+            window.auth.createUserWithEmailAndPassword(email, password)
+              .then(function(userCredential) {
+                dispatch({ type: "auth/loginSuccess", payload: { email: userCredential.user.email, name: userCredential.user.displayName || "Admin" } });
+              })
+              .catch(function(error) {
+                dispatch({ type: "auth/loginFailure", payload: error.message });
+              });
+          };
+        },
+        loginWithGoogle: function() {
+          return function (dispatch) {
+            dispatch({ type: "auth/setLoading", payload: true });
+            dispatch({ type: "auth/loginFailure", payload: null });
+            window.auth.signInWithPopup(window.googleProvider)
+              .then(function(result) {
+                dispatch({ type: "auth/loginSuccess", payload: { email: result.user.email, name: result.user.displayName } });
+              })
+              .catch(function(error) {
+                var errorMsg = error.message;
+                if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+                    errorMsg = "Google sign-in was cancelled.";
+                }
+                dispatch({ type: "auth/loginFailure", payload: errorMsg });
+              });
+          }
+        },
+        logout: function () { 
+          return function(dispatch) {
+            window.auth.signOut().then(() => {
+              dispatch({ type: "auth/logout" });
+            });
+          }
+        },
         setSearch: function (v) { return { type: "orders/setSearch", payload: v }; },
         setStatusFilter: function (v) { return { type: "orders/setStatusFilter", payload: v }; },
         setSortBy: function (v) { return { type: "orders/setSortBy", payload: v }; },
@@ -150,31 +209,72 @@
         setActivePage: function (v) { return { type: "ui/setActivePage", payload: v }; },
         toggleDarkMode: function () { return { type: "ui/toggleDarkMode" }; },
         toggleSidebar: function () { return { type: "ui/toggleSidebar" }; },
+        
         fetchOrders: function () {
           return function (dispatch) {
             dispatch({ type: "orders/setLoading", payload: true });
-            setTimeout(function () { dispatch({ type: "orders/setData", payload: SHOP_DATA.orders }); }, 600);
+            window.db.collection('orders').get().then(function(snapshot) {
+              var list = [];
+              snapshot.forEach(function(doc) {
+                list.push({ id: doc.id, ...doc.data() });
+              });
+              dispatch({ type: "orders/setData", payload: list });
+            }).catch(e => {
+              console.error(e);
+              dispatch({ type: "orders/setData", payload: [] });
+            });
           };
         },
         fetchProducts: function () {
           return function (dispatch) {
             dispatch({ type: "products/setLoading", payload: true });
-            setTimeout(function () { dispatch({ type: "products/setData", payload: SHOP_DATA.products }); }, 700);
+            window.db.collection('products').get().then(function(snapshot) {
+              var list = [];
+              snapshot.forEach(function(doc) {
+                list.push({ id: doc.id, ...doc.data() });
+              });
+              dispatch({ type: "products/setData", payload: list });
+            }).catch(e => dispatch({ type: "products/setData", payload: [] }));
           };
         },
         fetchRevenue: function () {
           return function (dispatch) {
             dispatch({ type: "revenue/setLoading", payload: true });
-            setTimeout(function () { dispatch({ type: "revenue/setData", payload: { monthly: SHOP_DATA.monthlyRevenue, weekly: SHOP_DATA.weeklyRevenue } }); }, 500);
+            Promise.all([
+              window.db.collection('monthlyRevenue').get(),
+              window.db.collection('weeklyRevenue').get()
+            ]).then(function(results) {
+              var monthly = [];
+              var weekly = [];
+              results[0].forEach(doc => { monthly.push({ id: doc.id, ...doc.data() }); });
+              results[1].forEach(doc => { weekly.push({ id: doc.id, ...doc.data() }); });
+              
+              dispatch({ type: "revenue/setData", payload: { monthly: monthly, weekly: weekly } });
+            }).catch(e => dispatch({ type: "revenue/setData", payload: { monthly: [], weekly: [] } }));
           };
         },
         fetchCategories: function () {
           return function (dispatch) {
             dispatch({ type: "categories/setLoading", payload: true });
-            setTimeout(function () { dispatch({ type: "categories/setData", payload: SHOP_DATA.categories }); }, 550);
+            window.db.collection('categories').get().then(function(snapshot) {
+              var list = [];
+              snapshot.forEach(function(doc) {
+                list.push({ id: doc.id, ...doc.data() });
+              });
+              dispatch({ type: "categories/setData", payload: list });
+            }).catch(e => dispatch({ type: "categories/setData", payload: [] }));
           };
         }
       };
+
+      // Listen for auth state initialization
+      window.auth.onAuthStateChanged(function(user) {
+         if (user) {
+             store.dispatch({ type: "auth/loginSuccess", payload: { email: user.email, name: user.displayName || "Admin" } });
+         } else {
+             // Let it stay logged out
+         }
+      });
 
       window.shopStore = store;
       window.shopActions = shopActions;
@@ -182,7 +282,7 @@
   </script>
 
   <!-- App logic -->
-  <script type="text/babel" src="app.jsx"></script>
+  <script type="text/babel" src="app.babel"></script>
 </body>
 
 </html>

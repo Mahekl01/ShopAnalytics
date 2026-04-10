@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "275250297765",
+    "firebase_url": "https://quantam-market-default-rtdb.firebaseio.com",
+    "project_id": "quantam-market",
+    "storage_bucket": "quantam-market.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275250297765:android:9480bc571263fa5324464c",
+        "android_client_info": {
+          "package_name": "com.example.quantamgrocers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "275250297765-u74siutalfm6h1u37nuo41oospledvt7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.quantamgrocers",
+            "certificate_hash": "1f3f0aecc926ec15574782009a141e26701cb99a"
+          }
+        },
+        {
+          "client_id": "275250297765-c38sdej3rcvh8db5g12urhn13rstf9sr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZNt1yLKYDPJ_vh3IAb6n3cVM7r77eSAI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "275250297765-c38sdej3rcvh8db5g12urhn13rstf9sr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
